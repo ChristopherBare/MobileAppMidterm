@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
     Spinner spinner;
     Context context;
     Button button;
+    boolean noMoreGenres = false;
 
 
     @Override
@@ -64,21 +65,35 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String filter = spinner.getSelectedItem().toString();
-                new GetDataAsync(filter).execute("https://rss.itunes.apple.com/api/v1/us/ios-apps/top-free/all/50/explicit.json");
+                String filter = spinner.getItemAtPosition(spinner.getSelectedItemPosition()).toString();
+                //new GetDataAsync(filter).execute("https://rss.itunes.apple.com/api/v1/us/ios-apps/top-free/all/50/explicit.json");
+                filteredAppsList = new ArrayList<>();
+
+                if (filter.equals("All")) {
+                    filterApps(apps);
+                } else {
+                    for (App app : apps)
+                        if (app.getGenres().contains(filter))
+                            filteredAppsList.add(app);
+                    filterApps(filteredAppsList);
+                }
             }
         });
 
-        if (appList != null) {
-            appList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Intent intent = new Intent(MainActivity.this, AppDetails.class);
-                    //put extras here
-                    startActivity(intent);
-                }
-            });
-        }
+        appList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                TextView app_name = view.findViewById(R.id.appName);
+                Intent intent = new Intent(MainActivity.this, AppDetails.class);
+
+                for (App app : apps)
+                    if (app.getName().equals(app_name))
+                        intent.putExtra("App", app);
+
+                startActivity(intent);
+            }
+        });
     }
 
     private boolean isConnected() {
@@ -90,9 +105,15 @@ public class MainActivity extends AppCompatActivity {
                         || networkInfo.getType() == ConnectivityManager.TYPE_MOBILE);
     }
 
+    private void filterApps(ArrayList<App> apps) {
+        adapter = new AppAdapter(getApplicationContext(), R.layout.activity_app_item, apps);
+        appList.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+    }
+
     private class GetDataAsync extends AsyncTask<String, Void, ArrayList<App>> {
         ProgressDialog dialog;
-        String filterParam;
+        String filterParam = null;
         @RequiresApi(api = Build.VERSION_CODES.KITKAT)
         @Override
         protected ArrayList<App> doInBackground(String... params) {
@@ -114,6 +135,8 @@ public class MainActivity extends AppCompatActivity {
                     JSONObject feed = root.getJSONObject("feed");
 
                     JSONArray resultApps = feed.getJSONArray("results");
+
+                    genreArray.add("All");
 
                     for (int i = 0; i < feed.length(); i++) {
 
@@ -139,14 +162,17 @@ public class MainActivity extends AppCompatActivity {
                                 JSONObject genre = genresJSON.getJSONObject(j);
                                 genreName = genre.getString("name");
                                 app.addGenre(genreName);
-                                if (!genreArray.contains(genresJSON.getString(j))) {
-                                genreArray.add(genreName);
-                                }
+                                if (!genreArray.contains(genreName))
+                                    genreArray.add(genreName);
                             }
                         }
 
                         //Add this person to our results
-                        result.add(app);
+                        if (filterParam == null)
+                            result.add(app);
+                        else if (app.getGenres().contains(filterParam))
+                            result.add(app);
+
                         Log.d("demo", "doInBackground: " + app.toString());
                     }
                 }
@@ -185,23 +211,10 @@ public class MainActivity extends AppCompatActivity {
             if (dialog.isShowing()) {
                 dialog.dismiss();
             }
-            if (apps.size() == 0){
-                apps.addAll(result);
-            } else {
-                //need to fix this, doesn't work right.
-                filteredAppsList.clear();
-                for (int i = 0; i < apps.size(); i++) {
-                    if (result.get(i).getGenres().contains(filterParam)) {
-                        if (!filteredAppsList.contains(result.get(i))) {
-                            filteredAppsList.add(apps.get(i));
-                        }
+            if (apps.size() == 0) apps.addAll(result);
+            else filteredAppsList.addAll(result);
 
-                    }
-                }
-                apps.clear();
-                apps.addAll(filteredAppsList);
-            }
-                adapter = new AppAdapter(getApplicationContext(), R.layout.activity_app_item, apps);
+                adapter = new AppAdapter(getApplicationContext(), R.layout.activity_app_item, result);
                 appList = findViewById(R.id.list_view_apps);
                 appList.setAdapter(adapter);
                 adapter.notifyDataSetChanged();

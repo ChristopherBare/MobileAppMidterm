@@ -2,9 +2,10 @@ package com.christopherbare.midterm;
 
 import android.net.Uri;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class App {
+public class App implements Serializable {
     String name, releaseDate, artistName, copyright, artworkUrl100;
     ArrayList<String> genres = new ArrayList<>();
 

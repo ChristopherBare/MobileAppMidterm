@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
         context = getApplicationContext();
         activity = MainActivity.this;
         button = findViewById(R.id.button);
+        appList = findViewById(R.id.list_view_apps);
 
         if(isConnected()) {
             new GetDataAsync().execute("https://rss.itunes.apple.com/api/v1/us/ios-apps/top-free/all/50/explicit.json");
@@ -84,12 +85,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                TextView app_name = view.findViewById(R.id.appName);
+                TextView app = view.findViewById(R.id.appName);
+                String app_name = app.getText().toString();
                 Intent intent = new Intent(MainActivity.this, AppDetails.class);
 
-                for (App app : apps)
-                    if (app.getName().equals(app_name))
-                        intent.putExtra("App", app);
+                for (App a : apps)
+                    if (a.getName().equals(app_name))
+                        intent.putExtra("App", a);
 
                 startActivity(intent);
             }

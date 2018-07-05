@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Midterm</string>
+    <string name="name">App Name</string>
+    <string name="ArtistName">Artist Name</string>
+    <string name="AppIcon">Icon</string>
+    <string name="genres">Genres</string>
+    <string name="release_date">Release Date</string>
+    <string name="copyright">copyright</string>
+    <string name="genreLabel">Genre:</string>
+    <string name="filterbutton">Filter</string>
+</resources>

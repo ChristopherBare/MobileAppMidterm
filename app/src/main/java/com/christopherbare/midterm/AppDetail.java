@@ -1,6 +1,5 @@
 package com.christopherbare.midterm;
 
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.ImageView;
@@ -13,7 +12,7 @@ public class AppDetail extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_app_detail2);
+        setContentView(R.layout.activity_app_detail);
 
             if (getIntent().getExtras()!=null){
                 TextView name = findViewById(R.id.name);

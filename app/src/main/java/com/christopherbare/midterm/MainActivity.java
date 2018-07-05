@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
 
                 TextView app = view.findViewById(R.id.appName);
                 String app_name = app.getText().toString();
-                Intent intent = new Intent(MainActivity.this, AppDetails.class);
+                Intent intent = new Intent(MainActivity.this, AppDetail.class);
 
                 for (App a : apps)
                     if (a.getName().equals(app_name))
